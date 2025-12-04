@@ -21,7 +21,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", file);
 
-    console.log("Submitting file:", file.name, file.type, file.size); // Debug log
+    console.log("Submitting file:", file.name, file.type, file.size);
 
     try {
       const response = await axios.post(
@@ -31,10 +31,10 @@ function App() {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
-      console.log("Response:", response.data); // Debug log
+      console.log("Response:", response.data);
       setResponse(response.data);
     } catch (error) {
       console.error("Error details:", error);
