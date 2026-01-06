@@ -3,11 +3,11 @@ import "./App.css";
 import axios from "axios";
 
 function App() {
-  const [image, setImage] = useState(null);
-  const [file, setFile] = useState(null);
+  const [image, setImage] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [response, setResponse] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const submit = async () => {
     if (!file) {
@@ -31,16 +31,21 @@ function App() {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        },
+        }
       );
 
       console.log("Response:", response.data);
       setResponse(response.data);
     } catch (error) {
       console.error("Error details:", error);
-      console.error("Error response:", error.response?.data);
-      setError(error.response?.data?.detail || error.message);
-      alert(`Upload failed: ${error.response?.data?.detail || error.message}`);
+      const axiosError = error as any;
+      console.error("Error response:", axiosError.response?.data);
+      setError(axiosError.response?.data?.detail || axiosError.message);
+      alert(
+        `Upload failed: ${
+          axiosError.response?.data?.detail || axiosError.message
+        }`
+      );
     } finally {
       setLoading(false);
     }
@@ -58,7 +63,9 @@ function App() {
   return (
     <>
       <div style={{ padding: "20px" }}>
-        <h1>Parasitic Eggs Detection</h1>
+        <h1 className="underline text-2xl font-bold">
+          Parasitic Eggs Detection
+        </h1>
 
         <input
           type="file"
