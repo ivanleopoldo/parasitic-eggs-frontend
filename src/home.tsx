@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { api } from "./lib/api";
 import { useNavigate } from "react-router";
 import {
   useDropzone,
@@ -46,17 +46,26 @@ export function Home() {
     formData.append("file", file);
 
     try {
-      // Get the processed image with bounding boxes
-      const res = await axios.post("http://localhost:8000/predict", formData, {
-        responseType: "blob", // important to get image as blob
-      });
+      const res = await api.post("/predict", formData);
 
-      const imageUrl = URL.createObjectURL(res.data);
+      const data = res.data as { image: string; results: any[] };
 
-      // Navigate to preview page with the backend-processed image
+      const byteString = atob(data.image);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+
+      const blob = new Blob([ab], { type: "image/png" });
+
+      const imageUrl = URL.createObjectURL(blob);
+
       navigate("/preview", {
         state: {
           image: imageUrl,
+          results: data.results,
         },
       });
     } catch (err) {
@@ -75,7 +84,6 @@ export function Home() {
         Parasitic Eggs Detection
       </h1>
 
-      {/* Dropzone */}
       <div className="flex-1 flex items-center justify-center p-4">
         <Dropzone {...dropzone}>
           <DropzoneMessage />
@@ -114,7 +122,6 @@ export function Home() {
         </Dropzone>
       </div>
 
-      {/* Submit button */}
       <div className="w-full p-4 flex justify-center">
         <Button
           onClick={submit}

@@ -6,16 +6,17 @@ export function Preview() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { image } = location.state as {
-    image: string;
-  };
+  const state = location.state as { image?: string } | null;
 
-  // Redirect to home if no image
   useEffect(() => {
-    if (!image) navigate("/");
-  }, [image, navigate]);
+    if (!state?.image) {
+      navigate("/", { replace: true });
+    }
+  }, [state, navigate]);
 
-  if (!image) return null;
+  if (!state?.image) return null;
+
+  const { image } = state;
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-gray-100">
@@ -26,7 +27,7 @@ export function Preview() {
       </div>
 
       <div className="flex-1 flex justify-center items-center p-2 overflow-auto">
-        <div className="relative w-full max-w-screen-xl aspect-video">
+        <div className="relative w-full max-w-7xl aspect-video">
           <img
             src={image}
             alt="Uploaded"
